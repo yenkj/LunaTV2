@@ -2,7 +2,7 @@
 
 [![English Doc](https://img.shields.io/badge/Doc-English-blue)](README_EN.md)
 [![中文文档](https://img.shields.io/badge/文档-中文-blue)](README.md)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yenkj/LunaTV)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yenkj/LunaTV2)
 </div>
 
 ---
