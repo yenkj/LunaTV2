@@ -3211,6 +3211,22 @@ useEffect(() => {
               return nextState; // 立即返回新状态
             },
           },
+          {  
+            name: '音轨',  
+            html: '音轨选择',  
+            icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"><text x="50%" y="50%" font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="middle">音</text></svg>',  
+            selector: [],  // 初始为空,在 ready 事件中动态填充  
+            onSelect: function (item: any) {  
+              const video = artPlayerRef.current.video;  
+              if (video.audioTracks) {  
+                for (let i = 0; i < video.audioTracks.length; i++) {  
+                  video.audioTracks[i].enabled = (i === item.index);  
+                }  
+                artPlayerRef.current.notice.show = `音轨: ${item.html}`;  
+              }  
+               return item.html;  
+            },  
+          },
         ],
         // 控制栏配置
         controls: [
@@ -3438,7 +3454,32 @@ useEffect(() => {
       // 监听播放器事件
       artPlayerRef.current.on('ready', async () => {
         setError(null);
-
+      // 🎵 检测并填充音轨选项  
+      const video = artPlayerRef.current.video;  
+      if (video.audioTracks && video.audioTracks.length > 1) {  
+        console.log('🎵 检测到多音轨:', video.audioTracks.length);  
+      
+        const audioTrackOptions = [];  
+        for (let i = 0; i < video.audioTracks.length; i++) {  
+          const track = video.audioTracks[i];  
+          audioTrackOptions.push({  
+            html: track.label || track.language || `音轨 ${i + 1}`,  
+            index: i,  
+            default: track.enabled  
+          });  
+        }  
+      
+        // 更新 settings 中的音轨选择器  
+        const audioSetting = artPlayerRef.current.setting.find(  
+          (s: any) => s.name === '音轨'  
+        );  
+        if (audioSetting) {  
+          audioSetting.selector = audioTrackOptions;  
+          console.log('✅ 已添加音轨选项到设置菜单:', audioTrackOptions);  
+        }  
+      } else {  
+        console.log('ℹ️ 未检测到多音轨或不支持 audioTracks API');  
+      }  
         // iOS设备自动播放优化：如果是静音启动的，在开始播放后恢复音量
         if ((isIOS || isSafari) && artPlayerRef.current.muted) {
           console.log('iOS设备静音自动播放，准备在播放开始后恢复音量');
