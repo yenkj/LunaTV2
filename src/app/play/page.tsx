@@ -1088,7 +1088,7 @@ function PlayPageClient() {
       }
     } else {
       // 普通视频格式
-      const newUrl = episodeData || '';
+      let newUrl = episodeData || '';
     // 🎬 添加转码逻辑: 如果是 banana 源且是 /r/ 端点,转换为 /t/ 转码端点  
     if (detailData.source === 'banana' && newUrl.includes('/r/')) {  
       const match = newUrl.match(/\/r\/([^.]+)\.(\w+)/);  
