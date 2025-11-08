@@ -3214,8 +3214,8 @@ useEffect(() => {
           {    
             name: '音轨',    
             html: '音轨选择',    
-            icon: '<text x="50%" y="50%" font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="middle" fill="#ffffff">音</text>',  
-            selector: [],  
+            tooltip: '选择音轨',  
+            selector: [],  // 初始为空,在 ready 事件中动态填充  
             onSelect: function (item: any) {    
               const video = artPlayerRef.current.video;    
               if (video.audioTracks) {    
