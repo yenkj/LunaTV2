@@ -3211,22 +3211,37 @@ useEffect(() => {
               return nextState; // 立即返回新状态
             },
           },
-          {    
-            name: '音轨',    
-            html: '音轨选择',    
-            tooltip: '选择音轨',  
-            selector: [],  // 初始为空,在 ready 事件中动态填充  
-            onSelect: function (item: any) {    
-              const video = artPlayerRef.current.video;    
-              if (video.audioTracks) {    
-                for (let i = 0; i < video.audioTracks.length; i++) {    
-                  video.audioTracks[i].enabled = (i === item.index);    
-                }    
-                artPlayerRef.current.notice.show = `音轨: ${item.html}`;    
-              }    
-              return item.html;    
-            },    
-          },
+{    
+  name: '音轨',    
+  html: '音轨选择',    
+  tooltip: '选择音轨',  
+  selector: [],  // 初始为空,在 ready 事件中动态填充  
+  onSelect: function (item: any) {  
+    console.log('🎵 音轨选择被点击:', item);  
+    console.log('🎵 artPlayerRef.current:', artPlayerRef.current);  
+      
+    const video = artPlayerRef.current.video;  
+    console.log('🎵 video 元素:', video);  
+    console.log('🎵 video.audioTracks:', video.audioTracks);  
+      
+    if (video.audioTracks) {  
+      console.log('🎵 当前音轨数量:', video.audioTracks.length);  
+      for (let i = 0; i < video.audioTracks.length; i++) {  
+        console.log(`🎵 音轨 ${i}:`, {  
+          label: video.audioTracks[i].label,  
+          language: video.audioTracks[i].language,  
+          enabled: video.audioTracks[i].enabled  
+        });  
+        video.audioTracks[i].enabled = (i === item.index);  
+      }  
+      console.log('🎵 切换到音轨:', item.index);  
+      artPlayerRef.current.notice.show = `音轨: ${item.html}`;  
+    } else {  
+      console.warn('⚠️ video.audioTracks 不可用');  
+    }  
+    return item.html;  
+  },    
+},
         ],
         // 控制栏配置
         controls: [
@@ -3454,32 +3469,63 @@ useEffect(() => {
       // 监听播放器事件
       artPlayerRef.current.on('ready', async () => {
         setError(null);
-      // 🎵 检测并填充音轨选项  
-      const video = artPlayerRef.current.video;  
-      if (video.audioTracks && video.audioTracks.length > 1) {  
-        console.log('🎵 检测到多音轨:', video.audioTracks.length);  
+  // 🎵 检测并填充音轨选项 - 增强调试版本  
+  console.log('🎵 播放器 ready 事件触发');  
+  const video = artPlayerRef.current.video;  
+  console.log('🎵 video 元素:', video);  
+  console.log('🎵 video.audioTracks:', video.audioTracks);  
+  console.log('🎵 video.audioTracks 类型:', typeof video.audioTracks);  
+    
+  if (video.audioTracks) {  
+    console.log('🎵 检测到 audioTracks API');  
+    console.log('🎵 音轨数量:', video.audioTracks.length);  
       
-        const audioTrackOptions = [];  
-        for (let i = 0; i < video.audioTracks.length; i++) {  
-          const track = video.audioTracks[i];  
-          audioTrackOptions.push({  
-            html: track.label || track.language || `音轨 ${i + 1}`,  
-            index: i,  
-            default: track.enabled  
-          });  
-        }  
-      
-        // 更新 settings 中的音轨选择器  
-        const audioSetting = artPlayerRef.current.setting.find(  
-          (s: any) => s.name === '音轨'  
-        );  
-        if (audioSetting) {  
-          audioSetting.selector = audioTrackOptions;  
-          console.log('✅ 已添加音轨选项到设置菜单:', audioTrackOptions);  
-        }  
-      } else {  
-        console.log('ℹ️ 未检测到多音轨或不支持 audioTracks API');  
+    if (video.audioTracks.length > 1) {  
+      console.log('🎵 检测到多音轨:', video.audioTracks.length);  
+        
+      const audioTrackOptions = [];  
+      for (let i = 0; i < video.audioTracks.length; i++) {  
+        const track = video.audioTracks[i];  
+        console.log(`🎵 音轨 ${i}:`, {  
+          label: track.label,  
+          language: track.language,  
+          enabled: track.enabled,  
+          kind: track.kind,  
+          id: track.id  
+        });  
+          
+        audioTrackOptions.push({  
+          html: track.label || track.language || `音轨 ${i + 1}`,  
+          index: i,  
+          default: track.enabled  
+        });  
       }  
+        
+      console.log('🎵 构建的音轨选项:', audioTrackOptions);  
+        
+      // 更新 settings 中的音轨选择器  
+      console.log('🎵 查找音轨设置项...');  
+      console.log('🎵 当前所有 settings:', artPlayerRef.current.setting);  
+        
+      const audioSetting = artPlayerRef.current.setting.find(  
+        (s: any) => s.name === '音轨'  
+      );  
+        
+      console.log('🎵 找到的音轨设置项:', audioSetting);  
+        
+      if (audioSetting) {  
+        audioSetting.selector = audioTrackOptions;  
+        console.log('✅ 已添加音轨选项到设置菜单:', audioTrackOptions);  
+        console.log('✅ 更新后的 audioSetting:', audioSetting);  
+      } else {  
+        console.error('❌ 未找到名为"音轨"的设置项');  
+      }  
+    } else {  
+      console.log('ℹ️ 只有单音轨,不显示选择器');  
+    }  
+  } else {  
+    console.log('ℹ️ 浏览器不支持 audioTracks API 或视频未加载音轨信息');  
+  }  
         // iOS设备自动播放优化：如果是静音启动的，在开始播放后恢复音量
         if ((isIOS || isSafari) && artPlayerRef.current.muted) {
           console.log('iOS设备静音自动播放，准备在播放开始后恢复音量');
