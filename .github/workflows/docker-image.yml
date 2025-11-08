@@ -97,7 +97,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
-          outputs: type=image,name=ghcr.io/${{ steps.lowercase.outputs.owner }}/lunatv,name-canonical=true,push=true
+          outputs: type=image,name=ghcr.io/${{ steps.lowercase.outputs.owner }}/lunatv2,name-canonical=true,push=true
           no-cache: true
           pull: true
 
